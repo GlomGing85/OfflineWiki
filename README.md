@@ -1,3 +1,5 @@
+assets/logo_icon.png
+
 # Offline Wiki — Native Android App
 
 > A fully native Android encyclopedia application with Material Design 3, dark mode, offline reading, folder organization, batch Wikipedia downloads, and SD card storage support.
