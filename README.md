@@ -1,4 +1,4 @@
-assets/logo_icon.png
+(assets/logo_icon.png)
 
 # Offline Wiki — Native Android App
 
