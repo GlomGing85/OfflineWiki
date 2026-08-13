@@ -2,9 +2,10 @@ name: Build Android App
 
 on:
   push:
-    branches: ["**"]
+    branches: [ "**" ]
   pull_request:
-    branches: ["**"]
+    branches: [ "**" ]
+  workflow_dispatch:   # кнопка "Run workflow" для ручного запуску
 
 jobs:
   build:
@@ -16,59 +17,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '11'
+          java-version: '17'
           cache: gradle
 
-      - name: Cache Gradle wrapper & caches
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Ensure Gradle wrapper exists
+      - name: Generate Gradle wrapper (8.7) if missing
         run: |
           if [ ! -f ./gradlew ]; then
-            echo "gradlew not found, generating wrapper using a temporary Gradle installation"
-            sudo apt-get update
-            sudo apt-get install -y unzip curl
-            GRADLE_VERSION=7.6
+            GRADLE_VERSION=8.7
             curl -sL "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -o gradle.zip
-            sudo mkdir -p /opt/gradle
             sudo unzip -q gradle.zip -d /opt/gradle
-            echo "/opt/gradle/gradle-${GRADLE_VERSION}/bin" >> $GITHUB_PATH
-            echo "Installed Gradle ${GRADLE_VERSION} and added to PATH"
-            gradle -v
-            gradle wrapper --gradle-version ${GRADLE_VERSION}
-          else
-            echo "gradlew already present"
+            /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle wrapper --gradle-version ${GRADLE_VERSION}
           fi
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build (assemble release)
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
+      - name: Build debug APK (головне — цей встановиться на телефон)
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Build app bundle (optional)
-        run: ./gradlew bundleRelease --no-daemon --stacktrace
+      - name: Build release (опційно, unsigned)
+        run: ./gradlew assembleRelease --no-daemon
         continue-on-error: true
 
-      - name: Upload APK artifact
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
-          path: app/build/outputs/**/*.apk
-
-      - name: Upload AAB artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-aab
-          path: app/build/outputs/**/*.aab
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
