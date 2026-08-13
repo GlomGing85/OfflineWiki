@@ -30,7 +30,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = '17' }
+    kotlinOptions {
+        jvmTarget = '17'
+        // TopAppBar та інші ExperimentalMaterial3Api — дозволяємо для всього
+        // модуля, щоб не розставляти @OptIn по кожному екрану (buildfix v4)
+        freeCompilerArgs += ['-opt-in=androidx.compose.material3.ExperimentalMaterial3Api']
+    }
     buildFeatures { compose true }
 }
 
@@ -67,4 +72,14 @@ dependencies {
     // Theme.Material3.* у res/values*/themes.xml і атрибутів
     // colorPrimary/colorSurface/... (Compose-material3 їх НЕ дає!)
     implementation 'com.google.android.material:material:1.12.0'
+
+    // OkHttp (buildfix v4) — WikiRepository робить завантаження через нього
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    // Markdown -> HTML (buildfix v4) — commonmark-java.
+    // У коді was import org.jetbrains.markdown.Markdown + Markdown.parse(),
+    // але такого класу в цій бібліотеці НЕМА (пакет org.intellij.markdown,
+    // фасаду Markdown.parse там не існує) → заміна на commonmark, патч у
+    // ui/MarkdownRenderer.kt уже застосований.
+    implementation 'org.commonmark:commonmark:0.24.0'
 }
