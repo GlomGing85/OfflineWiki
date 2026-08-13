@@ -62,4 +62,9 @@ dependencies {
 
     // Корутини/Flow (WikiRepository, сервіси)
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+
+    // Material Components XML-теми (buildfix v3) — потрібні для
+    // Theme.Material3.* у res/values*/themes.xml і атрибутів
+    // colorPrimary/colorSurface/... (Compose-material3 їх НЕ дає!)
+    implementation 'com.google.android.material:material:1.12.0'
 }
