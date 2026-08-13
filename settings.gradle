@@ -1,2 +1,29 @@
+// settings.gradle для OfflineWiki (FlexTeam buildfix v2)
+// ═══════════════════════════════════════════════════════
+// ЦЕЙ ФАЙЛ — і є справжнє ліки від падіння на build.gradle:3.
+//
+// Чому: репозиторії ПЛАГІНІВ (plugins{}) і репозиторії ЗАЛЕЖНОСТЕЙ
+// — це в Gradle два різних списки. Плагіни шукаються тут, у
+// pluginManagement. com.android.application живе ТІЛЬКИ в google()
+// (на Gradle Plugin Portal його нема), тому без цього блоку
+// збірка падає з "Plugin [id: 'com.android.application', ...] was
+// not found" ще до початку компіляції.
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 rootProject.name = 'OfflineWiki'
 include ':app'
